@@ -105,3 +105,8 @@ run `common.sh` script
 ./scripts/common.sh
 ```
 https://monowar-mukul.medium.com/kubernetes-create-a-new-token-and-join-command-to-rejoin-add-worker-node-74bbe8774808
+
+
+## Step 4: Dashboard, jenkins, external load balancer 
+
+https://itnext.io/kubernetes-loadbalancer-service-for-on-premises-6b7f75187be8
