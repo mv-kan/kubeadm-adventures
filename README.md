@@ -54,29 +54,35 @@ You should repeat these installation steps on `server` and on `node0` machines
 
 
 ### 1. Install kube tools
-https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/ (Debian based distibutions)
 
-Our runtime is going to be containerd: 
-https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd
-https://unix.stackexchange.com/questions/626645/how-to-install-containerd-on-debian 
-after install don't forget 
 ```
-sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo apt-get update
+# apt-transport-https may be a dummy package; if so, you can skip that package
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+# If the directory `/etc/apt/keyrings` does not exist, it should be created before the curl command, read the note below.
+# sudo mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+# This overwrites any existing configuration in /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
+sudo systemctl enable --now kubelet
+```
+
+### 2. Install containerd 
+```
+sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt update
+sudo apt install -y containerd.io
 sudo systemctl enable --now containerd
+containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
 ```
 
-DO NOT FORGET TO DO THAT FOR YOUR `containerd` CONFIGURATION
-https://kubernetes.io/docs/setup/production-environment/container-runtimes/#containerd-systemd
-```
-# source https://serverfault.com/questions/1074008/containerd-1-4-9-unimplemented-desc-unknown-service-runtime-v1alpha2-runtimese
-cat > /etc/containerd/config.toml <<EOF
-[plugins."io.containerd.grpc.v1.cri"]
-  systemd_cgroup = true
-EOF
-systemctl restart containerd
-```
-
-### 2. Disable swap (permanently)
+### 3. Disable swap (permanently)
 
 ```
 sudo swapoff -a  
@@ -85,8 +91,6 @@ sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 Source: https://askubuntu.com/questions/214805/how-do-i-disable-swap
 
 ## Step 3: kubeadm create cluster and add first node
-https://www.youtube.com/watch?v=xX52dc3u2HU
-https://github.com/techiescamp/kubeadm-scripts
 
 `control-panel.sh` script is really simple. I encourage you to read it before execution.
 
@@ -100,6 +104,7 @@ cd kubeadm-adventures
 # 192.168.122.52 - is my ip address of server 
 ./scripts/control-panel.sh 192.168.122.52
 ```
+
 After that your gonna see command that looks like this 
 
 ```
@@ -110,9 +115,18 @@ sudo kubeadm join 192.168.122.52:6443 --token qvcj8q.mfl5eurdwfh6u92i --discover
 Paste this command into your `node0` machine. 
 
 If you miss this output you can create join command whenever you want. 
+```
+[root@devops ~]# kubeadm token generate
+hp9b0k.1g9tqz8vkf78ucwf
+[root@devops ~]# kubeadm token create hp9b0k.1g9tqz8vkf78ucwf --print-join-command
+[W1022 19:51:03.885049   26680 configset.go:202] WARNING: kubeadm cannot validate component configs for API groups [kubelet.config.k8s.io kubeproxy.config.k8s.io]
+kubeadm join 192.168.56.110:6443 --token hp9b0k.1g9tqz8vkf78ucwf     --discovery-token-ca-cert-hash sha256:32eb67948d72ba99aac9b5bb0305d66a48f43b0798cb2df99c8b1c30708bdc2c
+# Source https://monowar-mukul.medium.com/kubernetes-create-a-new-token-and-join-command-to-rejoin-add-worker-node-74bbe8774808
+```
 
-https://monowar-mukul.medium.com/kubernetes-create-a-new-token-and-join-command-to-rejoin-add-worker-node-74bbe8774808
-
+Sources:
+- https://www.youtube.com/watch?v=xX52dc3u2HU
+- https://github.com/techiescamp/kubeadm-scripts
 
 ## Step 4: Dashboard, jenkins, external load balancer on premises 
 
