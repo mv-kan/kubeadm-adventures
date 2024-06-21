@@ -113,13 +113,16 @@ https://monowar-mukul.medium.com/kubernetes-create-a-new-token-and-join-command-
 
 ## Step 4: Dashboard, jenkins, external load balancer on premises 
 
-Load balancer https://itnext.io/kubernetes-loadbalancer-service-for-on-premises-6b7f75187be8
+External Load Balancer (important) https://itnext.io/kubernetes-loadbalancer-service-for-on-premises-6b7f75187be8
 
 Jenkins is in submodule `k8s-jenkins-setup`
 ```
 # on server machine
+git clone https://github.com/mv-kan/k8s-jenkins-setup.git
+cd k8s-jenkins-setup
+git checkout kubeadm-adventures
 kubectl create namespace devops
-kubectl apply -f ./k8s-jenkins-setup/k8s/jenkins  
+kubectl apply -f ./k8s/jenkins  
 ``` 
 
 Dashboard web ui
