@@ -88,23 +88,26 @@ Source: https://askubuntu.com/questions/214805/how-do-i-disable-swap
 https://www.youtube.com/watch?v=xX52dc3u2HU
 https://github.com/techiescamp/kubeadm-scripts
 
-`control-panel.sh` and `common.sh` scripts are really simple. I encourage you to read them before execution.
+`control-panel.sh` script is really simple. I encourage you to read it before execution.
 
 ### In `server`
 
 run `control-panel.sh` script 
 ```
+git clone https://github.com/mv-kan/kubeadm-adventures.git
+cd kubeadm-adventures
 # in terminal
-./scripts/control-panel.sh <IP address that is in network with host of current VM>
+# 192.168.122.52 - is my ip address of server 
+./scripts/control-panel.sh 192.168.122.52
 ```
 After that your gonna see command that looks like this 
 
 ```
-# 192.168.122.52 - ip address of control plane
+# 192.168.122.52 - ip address of server (control plane)
 sudo kubeadm join 192.168.122.52:6443 --token qvcj8q.mfl5eurdwfh6u92i --discovery-token-ca-cert-hash sha256:bd5626b7a4f8f4fc1927f5e5b63287e6147a36e17b42d5c44f874d6af43d26f3
 ``` 
 
-Paste this command into your `node0` machine 
+Paste this command into your `node0` machine. 
 
 If you miss this output you can create join command whenever you want. 
 
@@ -131,4 +134,10 @@ Dashboard web ui
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 # Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
 helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+# expose dashboard ui on server ip
+kubectl -n kubernetes-dashboard port-forward --address 192.168.122.52 svc/kubernetes-dashboard-kong-proxy 8443:443 
 ```
+
+### Metallb static IP 
+
+https://metallb.universe.tf/usage/
