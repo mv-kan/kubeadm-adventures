@@ -1,0 +1,3 @@
+[submodule "k8s-jenkins-setup"]
+	path = k8s-jenkins-setup
+	url = git@github.com:mv-kan/k8s-jenkins-setup.git

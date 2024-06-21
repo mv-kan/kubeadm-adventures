@@ -97,16 +97,35 @@ run `control-panel.sh` script
 # in terminal
 ./scripts/control-panel.sh <IP address that is in network with host of current VM>
 ```
+After that your gonna see command that looks like this 
 
-### In `node0`
-run `common.sh` script 
 ```
-# in terminal
-./scripts/common.sh
-```
+# 192.168.122.52 - ip address of control plane
+sudo kubeadm join 192.168.122.52:6443 --token qvcj8q.mfl5eurdwfh6u92i --discovery-token-ca-cert-hash sha256:bd5626b7a4f8f4fc1927f5e5b63287e6147a36e17b42d5c44f874d6af43d26f3
+``` 
+
+Paste this command into your `node0` machine 
+
+If you miss this output you can create join command whenever you want. 
+
 https://monowar-mukul.medium.com/kubernetes-create-a-new-token-and-join-command-to-rejoin-add-worker-node-74bbe8774808
 
 
-## Step 4: Dashboard, jenkins, external load balancer 
+## Step 4: Dashboard, jenkins, external load balancer on premises 
 
-https://itnext.io/kubernetes-loadbalancer-service-for-on-premises-6b7f75187be8
+Load balancer https://itnext.io/kubernetes-loadbalancer-service-for-on-premises-6b7f75187be8
+
+Jenkins is in submodule `k8s-jenkins-setup`
+```
+# on server machine
+kubectl create namespace devops
+kubectl apply -f ./k8s-jenkins-setup/k8s/jenkins  
+``` 
+
+Dashboard web ui
+```
+# Add kubernetes-dashboard repository
+helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
+helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
+```
