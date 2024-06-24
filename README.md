@@ -89,6 +89,7 @@ sudo apt install -y containerd.io
 sudo systemctl enable --now containerd
 containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
 sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+sudo systemctl restart containerd
 ```
 Source: https://docs.docker.com/engine/install/debian/
 ### 3. Disable swap (permanently)
