@@ -231,6 +231,22 @@ http://192.168.122.151/
 ```
 
 And now in your browser you should see `Unlock Jenkins` message
+
+## Step 6 (optional): Configure Jenkins and add Kubernetes cloud to Jenkins
+
+### Get initial password
+```
+kubectl get pods -n devops 
+kubectl exec --stdin --tty <jenkins pods> -n devops -- /bin/bash
+# inside pod
+cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+Very useful video on this topic
+https://www.youtube.com/watch?v=GNujTivkM7s
+
+### Add kubernetes
+
 ### Metallb static IP 
 
 https://metallb.universe.tf/usage/
