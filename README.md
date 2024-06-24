@@ -130,11 +130,33 @@ Sources:
 
 ## Step 4: Dashboard, jenkins, external load balancer on premises 
 
-External Load Balancer (important) https://itnext.io/kubernetes-loadbalancer-service-for-on-premises-6b7f75187be8
+### 1. External Load Balancer
 
+On `server` machine
+```
+cd ~
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+metallb 
+```
+kubectl create ns metallb-system
+helm upgrade --install -n metallb-system metallb \
+    oci://registry-1.docker.io/bitnamicharts/metallb
+```
+
+Before applying L2-range-allocation.yaml, please change ip address range if applicable 
+```
+cd <this repo folder>
+kubectl apply -f ./k8s/metallb/L2-range-allocation.yaml
+```
+
+### 2. Jenkins 
 Jenkins is in submodule `k8s-jenkins-setup`
 ```
 # on server machine
+cd ~
 git clone https://github.com/mv-kan/k8s-jenkins-setup.git
 cd k8s-jenkins-setup
 git checkout kubeadm-adventures
@@ -142,14 +164,16 @@ kubectl create namespace devops
 kubectl apply -f ./k8s/jenkins  
 ``` 
 
+### 3. Dashboard
 Dashboard web ui
 ```
 # Add kubernetes-dashboard repository
 helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 # Deploy a Helm Release named "kubernetes-dashboard" using the kubernetes-dashboard chart
 helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard
-# expose dashboard ui on server ip
-kubectl -n kubernetes-dashboard port-forward --address 192.168.122.52 svc/kubernetes-dashboard-kong-proxy 8443:443 
+# enter this repo directory and create new service for kong proxy (with metallb annotation)
+cd kubeadm-adventures
+kubectl apply -f ./k8s/dashboard/
 ```
 
 ### Metallb static IP 
