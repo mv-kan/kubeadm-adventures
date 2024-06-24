@@ -108,6 +108,7 @@ Source: https://askubuntu.com/questions/214805/how-do-i-disable-swap
 
 run `control-panel.sh` script 
 ```
+sudo apt install -y git 
 git clone https://github.com/mv-kan/kubeadm-adventures.git
 cd kubeadm-adventures
 # in terminal
