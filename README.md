@@ -134,6 +134,10 @@ cd kubeadm-adventures
 # in terminal
 # 192.168.122.52 - is my ip address of server 
 ./scripts/control-panel.sh 192.168.122.52
+ mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
 ```
 
 After that your gonna see command that looks like this 
@@ -143,7 +147,7 @@ After that your gonna see command that looks like this
 sudo kubeadm join 192.168.122.52:6443 --token qvcj8q.mfl5eurdwfh6u92i --discovery-token-ca-cert-hash sha256:bd5626b7a4f8f4fc1927f5e5b63287e6147a36e17b42d5c44f874d6af43d26f3
 ``` 
 
-Paste this command into your `node0` machine. 
+Paste this command into your `node0` machine, execute as `root`. 
 
 If you miss this output you can create join command whenever you want. 
 ```
@@ -206,7 +210,27 @@ git checkout kubeadm-adventures
 kubectl create namespace devops
 kubectl apply -f ./k8s/jenkins  
 ``` 
+## Step 5: Check external facing services (dashboard, jenkins)
+https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#manually-create-an-api-token-for-a-serviceaccount
 
+Enter into `jenkins-admin` account 
+```
+kubectl describe secret jenkins-admin-secret -n devops
+```
+Copy token and enter into this ip address 
+```
+# this should be your static ip address that you set in `L2-range-allocation.yaml` and `kubernetes-dashboard-kong-lb.yaml` files
+https://192.168.122.150/
+```
+You should see working one `jenkins/jenkins:lts` pods in `devops` namespace
+
+Then check `jenkins` service by this address 
+```
+# this should be your static ip address that you set in `k8s-jenkins-setup` repo, in `service.yaml` file
+http://192.168.122.151/
+```
+
+And now in your browser you should see `Unlock Jenkins` message
 ### Metallb static IP 
 
 https://metallb.universe.tf/usage/
