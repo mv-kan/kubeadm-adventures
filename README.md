@@ -161,19 +161,7 @@ cd <this repo folder>
 kubectl apply -f ./k8s/metallb/L2-range-allocation.yaml
 ```
 
-### 2. Jenkins 
-Jenkins is in submodule `k8s-jenkins-setup`
-```
-# on server machine
-cd ~
-git clone https://github.com/mv-kan/k8s-jenkins-setup.git
-cd k8s-jenkins-setup
-git checkout kubeadm-adventures
-kubectl create namespace devops
-kubectl apply -f ./k8s/jenkins  
-``` 
-
-### 3. Dashboard
+### 2. Dashboard
 Dashboard web ui
 ```
 # Add kubernetes-dashboard repository
@@ -184,6 +172,18 @@ helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dash
 cd kubeadm-adventures
 kubectl apply -f ./k8s/dashboard/ -n kubernetes-dashboard
 ```
+
+### 3. Jenkins 
+Jenkins is in submodule `k8s-jenkins-setup`
+```
+# on server machine
+cd ~
+git clone https://github.com/mv-kan/k8s-jenkins-setup.git
+cd k8s-jenkins-setup
+git checkout kubeadm-adventures
+kubectl create namespace devops
+kubectl apply -f ./k8s/jenkins  
+``` 
 
 ### Metallb static IP 
 
